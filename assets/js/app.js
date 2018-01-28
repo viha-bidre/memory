@@ -32,6 +32,27 @@ function init() {
 // Use jQuery to delay until page loaded.
 $(init);
 
+/*
+Attributions to all Tutorials and References:
 
+https://www.lynda.com/React-js-tutorials/React-js-Essential-Training/496905-2.html
+
+https://reactjs.org/tutorial/tutorial.html
+
+https://codepen.io/anon/pen/goVeZJ
+
+http://blog.krawaller.se/posts/a-react-js-case-study/
+
+http://lucybain.com/blog/2016/react-state-vs-pros/
+
+https://codepen.io/larryarmstrong/pen/dXXMvN?editors=0010
+
+https://www.youtube.com/watch?v=ywa8BseljUM&list=PLEVmaBhqzpLYyfjphTnO6JgFHL8VL6aSg
+
+https://reactjs.org/docs/conditional-rendering.html
+
+https://reactjs.org/docs/hello-world.html
+
+*/
 
 
