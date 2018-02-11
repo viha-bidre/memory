@@ -11,7 +11,7 @@
 //
 // If you no longer want to use a dependency, remember
 // to also remove its path from "config.paths.watched".
-// import "phoenix_html";
+import "phoenix_html";
 
 // Import local files
 //
@@ -19,14 +19,26 @@
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
+import {Socket} from "phoenix";
+let socket = new Socket("/socket", {params: {token: window.userToken}});
+socket.connect();
+
 
 // import run_game from "./game";
 //<script type="text/javascript" src="lib/lodash.js"></script>
-import run_demo from "./MemoryGame"
+import run_demo from "./MemoryGame";
+import $ from 'jquery'; 
 
 function init() {
-  let root = document.getElementById('game');
-  run_demo(root);
+  let root = document.getElementById('root');
+  if (root) {
+    let channel = socket.channel("games:" + window.gameName, {});
+    // channel.join()
+    //        .receive("ok", resp => { console.log("Joined successfully", resp) })
+    //        .receive("error", resp => { console.log("Unable to join", resp) });
+
+    run_demo(root, channel);
+  }
 }
 
 // Use jQuery to delay until page loaded.

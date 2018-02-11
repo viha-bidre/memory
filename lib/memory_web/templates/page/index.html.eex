@@ -1,6 +1,10 @@
-<h1>Memory Game</h1>
 
-<div id="game">
-  Loading...
+<div class="row">
+  <div class="col">
+    <h1 id="index-page">Join Memory Game</h1>
+    <p>Enter Your Name</p>
+    <input type=text id=userName />
+ 	<p><a href="" onclick="this.href='/game/'+document.getElementById('userName').value" >START GAME</a></p>
+  </div>
 </div>
 

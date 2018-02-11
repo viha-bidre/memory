@@ -2,83 +2,47 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
 
-export default function run_demo(root) {
-  ReactDOM.render(<MemoryGame />, root);
+export default function run_demo(root, channel) {
+  ReactDOM.render(<MemoryGame channel={channel}/>, root);
 }
-
-
-let allTiles = ["A", "B", "A", "B", "C", "C","D","D","E","E","F","F","G","G","H","H"];
 
 class MemoryGame extends React.Component {
   
-  constructor() {
-		super();
-		this.resetGame = this.resetGame.bind(this);
-		this.flipTile = this.flipTile.bind(this);
+  constructor(props) {
+  		console.log("Inside MemoryGame constructor");
+		super(props);
 		this.state = {
 			tiles: [],
 			flippedTiles: [],
-			clicks: 0
+			clicks: 0,
 		};
+		this.channel = props.channel;
+		this.channel.join()
+        	.receive("ok", this.gotView.bind(this))
+        	.receive("error", resp => { console.log("Unable to join", resp) });
 	}
 
-  resetGame() {
 
-		let tiles = _.shuffle(allTiles).map(function(val) {
-			return {
-				val: val,
-				status: "hidden"
-			};
-		});
+	gotView(view) {
+    	console.log("New view", view);
+    	this.setState(view.game);
+  	}
 
-		this.setState({
-			tiles: tiles,
-			clicks: 0
-		});
+	startGame() {
+    	console.log("Start Game");
+		this.channel.push("reset", {})
+        		.receive("ok", this.gotView.bind(this));
 	}
 
-  calcClicks() {
-		let newClicks = this.state.clicks + 1;
-		this.setState({clicks: newClicks}); 
-	}
-  
-  resetTilesStatus(allTiles, flippedTiles, newStatus) {
-    
-    for (var val of flippedTiles) {
-      allTiles[val].status = newStatus;
-    }
-    
-    return allTiles;
-  }
-
-  checkTileValue(allTiles, flippedTiles, status) {
-
-		for(var val of flippedTiles) {
-			if (allTiles[val][status] !== allTiles[flippedTiles[0]][status]) {
-				return false;
-			}
-		}
-		
-		return true;
-
+    resetGame() {
+    	console.log("Reset Game");
+		this.channel.push("reset", {})
+        		.receive("ok", this.gotView.bind(this));
 	}
 
-  checkForMatch(allTiles, flippedTiles) {
-		this.calcClicks();
+	flipTile(index) {
 
-		if(this.checkTileValue(allTiles,flippedTiles, "val")) {
-			allTiles = this.resetTilesStatus(allTiles, flippedTiles,"matched");
-		}
-		else {
-			allTiles = this.resetTilesStatus(allTiles, flippedTiles, "hidden");
-		}
-		return allTiles;
-	} 
-
-flipTile(index) {
-
-		if(this.ignoreTilesClicks !== true) {
-
+			console.log(this.state.flippedTiles)
 			let flippedTiles = _.concat(this.state.flippedTiles, index);
 			let allTiles = this.state.tiles;
 
@@ -88,18 +52,12 @@ flipTile(index) {
 				this.setState({
 					tiles: allTiles
 				});
-
-				let _this = this;
-
-				setTimeout(function() {
-					allTiles = _this.checkForMatch(allTiles,flippedTiles);
-					flippedTiles = [];
-
-					_this.setState({
-						flippedTiles: flippedTiles,
-						tiles: allTiles
-					});
+				
+				setTimeout( () => {
+					this.channel.push("checkForMatch", {flippedTiles: flippedTiles})
+								.receive("ok",this.gotView.bind(this));
 				},600);
+
 			}
 			else{
 
@@ -110,57 +68,58 @@ flipTile(index) {
 					tiles: allTiles
 				});
 			}
-		}
+			
 	}
   
-  render() {
+  	render() {
     
-    let clickEvent = this.flipTile;
-    let tileIndex = 0;
-    let message = "";
+    	let clickEvent = this.flipTile.bind(this);
+    	let tileIndex = 0;
+    	let message = "";
     
-    if (this.state.clicks > 16) {
-      message = "You Lose. Try Again!";
-    }
+    	if (this.state.clicks > 16) {
+      		message = "You Lose. Try Again!";
+    	}
     
-    return (
-      <div>
-        <button onClick={this.resetGame}>Start / Reset Game</button>
-        <p>Target Score : 16 guesses or less </p>
-        <p>Current Score : {this.state.clicks} guesses </p>
-        <p> {message} </p>
+    	return (
+      		<div>
+        		<p><button onClick={this.startGame.bind(this)}>Start Game</button></p>
+        		<p><button onClick={this.resetGame.bind(this)}>Reset Game</button></p>
+        		<p>Target Score : 16 guesses or less </p>
+        		<p>Current Score : {this.state.clicks} guesses </p>
+        		<p> {message} </p>
         
-        <div className="tiles">
-          {this.state.tiles.map(function(tile) {
-            return (
-              <Tile
-                index={tileIndex++}
-                clickEvent={clickEvent}
-                status={tile.status}
-                val={tile.val}
-              />
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
+        		<div className="tiles">
+          			{this.state.tiles.map(function(tile) {
+            		return (
+              		<Tile
+                		index={tileIndex++}
+                		clickEvent={clickEvent}
+                		status={tile.status}
+                		val={tile.val}
+              		/>
+            		);
+          		})}
+        		</div>
+      		</div>
+    	);
+  	}
 }
 
 class Tile extends React.Component {
   
-  constructor() {
+  	constructor() {
 		super();
 		this.flipTile = this.flipTile.bind(this);
 	}
   
-  flipTile() {
+  	flipTile() {
 		if(this.props.status === "hidden") {
 			this.props.clickEvent(this.props.index);
 		}
 	}
   
-  render() {
+  	render() {
 		return (
 			<div onClick = {this.flipTile} className = {"tile tile-" + this.props.status}>
 				 <div className = "tile-main">
