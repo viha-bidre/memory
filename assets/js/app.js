@@ -65,6 +65,14 @@ https://reactjs.org/docs/conditional-rendering.html
 
 https://reactjs.org/docs/hello-world.html
 
+https://hexdocs.pm/elixir/Enum.html#at/3
+
+https://til.hashrocket.com/posts/633ba08446-accessing-a-single-element-of-a-list-by-index
+
+http://learningwithjb.com/posts/concat-lists-with-elixir
+
+Starter code used from Notes for GameBackUp.
+
 */
 
 
