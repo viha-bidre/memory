@@ -16,6 +16,8 @@ defmodule Memory.Game do
 		}
 	end
 
+	
+
 	def checkForMatch(game, flippedTiles) do
 		
 		{x,tile1Val} = Enum.at(game.tiles, Enum.at(flippedTiles, 0))

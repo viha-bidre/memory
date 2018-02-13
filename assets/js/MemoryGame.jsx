@@ -42,32 +42,30 @@ class MemoryGame extends React.Component {
 
 	flipTile(index) {
 
-			console.log(this.state.flippedTiles)
-			let flippedTiles = _.concat(this.state.flippedTiles, index);
-			let allTiles = this.state.tiles;
+		let flippedTiles = _.concat(this.state.flippedTiles, index);
+		console.log(flippedTiles)
+		let allTiles = this.state.tiles;
 
-			allTiles[flippedTiles[flippedTiles.length - 1]].status = "flipped";
+		allTiles[flippedTiles[flippedTiles.length - 1]].status = "flipped";
 
-			if(flippedTiles.length === 2) {
-				this.setState({
-					tiles: allTiles
-				});
+		if(flippedTiles.length === 2) {
+			this.setState({
+				tiles: allTiles
+			});
 				
-				setTimeout( () => {
-					this.channel.push("checkForMatch", {flippedTiles: flippedTiles})
-								.receive("ok",this.gotView.bind(this));
-				},600);
+			setTimeout( () => {
+				this.channel.push("checkForMatch", {flippedTiles: flippedTiles})
+							.receive("ok",this.gotView.bind(this));
+			},600);
 
-			}
-			else{
-
-				allTiles[flippedTiles[0]].status = "flipped";
-
-				this.setState({
-					flippedTiles: flippedTiles,
-					tiles: allTiles
-				});
-			}
+		}
+		else{
+			allTiles[flippedTiles[0]].status = "flipped";
+			this.setState({
+				flippedTiles: flippedTiles,
+				tiles: allTiles
+			});
+		}
 			
 	}
   
